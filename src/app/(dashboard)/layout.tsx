@@ -11,8 +11,6 @@ export default async function DashboardLayout({
   const user = await getAuthUser()
   if (!user) redirect("/login")
 
-  console.log(user)
-
   return (
     <div className="min-h-screen flex flex-col">
       {/* 헤더 영역 */}
