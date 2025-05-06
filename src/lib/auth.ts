@@ -7,13 +7,11 @@ export async function getAuthUser() {
   // 토큰 가져오기
   const token = cookieStore.get("token")?.value
 
-  // 토큰이 없으면 null 반환
   if (!token) return null
 
-  // 토큰 검증
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-    return decoded as { userId: string }
+    return decoded as { userId: string; username: string }
   } catch {
     return null
   }

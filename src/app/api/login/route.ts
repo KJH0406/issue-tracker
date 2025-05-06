@@ -30,9 +30,13 @@ export async function POST(request: Request) {
     )
 
   // 토큰 생성
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
-    expiresIn: "7d", // 7일 후 만료
-  })
+  const token = jwt.sign(
+    { userId: user.id, username: user.username },
+    process.env.JWT_SECRET!,
+    {
+      expiresIn: "7d", // 7일 후 만료
+    }
+  )
 
   // 토큰 쿠키 설정
   const cookieStore = await cookies()
