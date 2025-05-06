@@ -11,7 +11,11 @@ export async function getAuthUser() {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-    return decoded as { userId: string; username: string }
+    return decoded as {
+      userId: string
+      username: string
+      email: string
+    }
   } catch {
     return null
   }

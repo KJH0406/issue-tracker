@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
   // 토큰 생성
   const token = jwt.sign(
-    { userId: user.id, username: user.username },
+    { userId: user.id, username: user.username, email: user.email },
     process.env.JWT_SECRET!,
     {
       expiresIn: "7d", // 7일 후 만료
