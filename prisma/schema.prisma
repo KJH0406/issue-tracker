@@ -1,24 +1,47 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// Prisma Client 생성 설정
 generator client {
   provider = "prisma-client-js"
 }
 
+// 데이터베이스 연결 설정 (supabase, prisma)
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")  
+  directUrl  = env("DIRECT_URL")    
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
 
+// 유저
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String
-  password  String
-  createdAt DateTime @default(now())
+  id        String   @id @default(uuid())   // UUID 자동 생성
+  email     String   @unique                // 로그인용 이메일(고유)
+  username  String                          // 화면에 표시할 사용자명
+  password  String                          // 암호화(해시)된 비밀번호
+  createdAt DateTime @default(now())        // 생성 시각 자동 기록
+}
+
+// 워크스페이스
+model Workspace {
+  id          String   @id @default(uuid()) // UUID 자동 생성
+  name        String                        // 워크스페이스 이름
+  imageUrl    String?                       // (선택) 대표 이미지 URL
+  inviteCode  String   @unique              // 공유용 초대 코드(고유)
+  userId      String                        // 생성자(Owner) User.id
+  createdAt   DateTime @default(now())      // 생성 시각 자동 기록
+  updatedAt   DateTime @updatedAt           // 업데이트 시각 자동 갱신
+
+  // 관계: 한 워크스페이스에 여러 멤버가 속한다
+  members     Member[]                      // Member 테이블과 1:N
+}
+
+// 워크스페이스 멤버
+model Member {
+  id          String   @id @default(uuid())  // UUID 자동 생성
+  userId      String                         // 가입한 User.id
+  workspaceId String                         // 속한 Workspace.id
+  role        String                         // 권한: "admin" | "member"
+
+  // 관계: 한 워크스페이스에 여러 멤버가 속한다
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
