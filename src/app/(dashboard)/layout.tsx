@@ -2,12 +2,18 @@
 
 import { Header } from "@/components/layout/Header"
 import { Sidebar } from "@/components/layout/Sidebar"
+import { getAuthUser } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const user = await getAuthUser()
+  if (!user) {
+    redirect("/login")
+  }
   return (
     <div className="h-screen flex flex-col">
       {/* 상단 헤더 */}
