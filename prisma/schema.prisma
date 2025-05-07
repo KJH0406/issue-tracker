@@ -14,11 +14,43 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-
+// 유저 모델
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String           @id @default(uuid())
+  email     String           @unique
   username  String
   password  String
-  createdAt DateTime @default(now())
+  createdAt DateTime         @default(now())
+
+  workspaces WorkspaceUser[] // 사용자 → 워크스페이스 연결 (다대다 관계)
+}
+
+// 워크스페이스 모델
+model Workspace {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+
+  users       WorkspaceUser[] // 워크스페이스 → 사용자 연결 (다대다 관계)
+}
+
+// 워크스페이스 사용자 중개 모델
+// 유저-워크스페이스 연결 + 역할 정보 저장
+model WorkspaceUser {
+  id          String           @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        WorkspaceRole 
+
+  user        User             @relation(fields: [userId], references: [id]) 
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId])
+}
+
+// 워크스페이스 역할
+enum WorkspaceRole {
+  ADMIN
+  MEMBER
 }
