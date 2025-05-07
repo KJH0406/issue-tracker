@@ -35,6 +35,7 @@ model Workspace {
 
   // 관계: 한 워크스페이스에 여러 멤버가 속한다
   members     Member[]                      // Member 테이블과 1:N
+  projects    Project[]                     // Project 테이블과 1:N
 }
 
 // 워크스페이스 멤버
@@ -47,3 +48,17 @@ model Member {
   // 관계: 한 워크스페이스에 여러 멤버가 속한다
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
+
+// 프로젝트
+model Project {
+  id           String   @id @default(uuid())         // 고유 ID
+  name         String                                // 프로젝트 이름
+  description  String?                               // 설명 (선택)
+  workspaceId  String                                // 소속 워크스페이스
+  userId       String                                // 생성자 ID
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+}
+
