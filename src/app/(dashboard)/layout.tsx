@@ -12,9 +12,11 @@ import {
   Users,
   FileText,
   Search,
+  Plus,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
-
+import { Button } from "@/components/ui/button"
+import CreateProjectModal from "@/components/project/create-project-modal"
 export default async function DashboardLayout({
   children,
 }: {
@@ -72,6 +74,7 @@ export default async function DashboardLayout({
                   <span className="hidden md:inline font-medium">프로젝트</span>
                 </Link>
               </li>
+              <li>{/* <CreateProjectModal />   */}</li>
               <li>
                 <Link
                   href="/calendar"
