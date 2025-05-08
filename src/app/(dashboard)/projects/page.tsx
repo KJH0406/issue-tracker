@@ -1,5 +1,6 @@
 "use client"
 
+import { getProjects } from "@/lib/api/project"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 
@@ -37,10 +38,8 @@ export default function ProjectListPage() {
       if (!selectedId) return
       setLoading(true)
       try {
-        const res = await fetch(`/api/projects?workspaceId=${selectedId}`)
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.message)
-        setProjects(data.projects)
+        const projects = await getProjects(selectedId)
+        setProjects(projects)
       } catch (err: any) {
         toast.error(err.message)
       } finally {

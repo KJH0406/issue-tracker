@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { createWorkspace } from "@/lib/api/workspace"
 
 // 새 워크스페이스 만들기 페이지
 export default function NewWorkspacePage() {
@@ -24,22 +25,10 @@ export default function NewWorkspacePage() {
     setLoading(true)
 
     try {
-      const res = await fetch("/api/workspaces", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, description }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.message || "워크스페이스 생성 실패")
-      }
+      await createWorkspace({ name, description })
 
       toast.success("워크스페이스가 생성되었습니다!")
-      router.push("/workspaces") // 목록 페이지로 이동 (다음 단계에서 구현)
+      router.push("/workspaces")
     } catch (err: any) {
       toast.error(err.message)
     } finally {

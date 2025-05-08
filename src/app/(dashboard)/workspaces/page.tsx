@@ -1,7 +1,6 @@
-// src/app/workspaces/page.tsx
-
 "use client"
 
+import { getWorkspaces } from "@/lib/api/workspace"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 
@@ -21,12 +20,8 @@ export default function WorkspaceListPage() {
   useEffect(() => {
     const fetchWorkspaces = async () => {
       try {
-        const res = await fetch("/api/workspaces")
-        const data = await res.json()
-
-        if (!res.ok) throw new Error(data.message || "불러오기 실패")
-
-        setWorkspaces(data.workspaces)
+        const workspaces = await getWorkspaces()
+        setWorkspaces(workspaces)
       } catch (err: any) {
         toast.error(err.message)
       } finally {

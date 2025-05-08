@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
+import { createProject } from "@/lib/api/project"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
@@ -40,20 +41,11 @@ export default function NewProjectPage() {
 
     setLoading(true)
     try {
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          description,
-          workspaceId: selectedId,
-        }),
+      await createProject({
+        name,
+        description,
+        workspaceId: selectedId,
       })
-
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.message || "생성 실패")
-      }
 
       toast.success("프로젝트가 생성되었습니다.")
       router.push("/projects")
