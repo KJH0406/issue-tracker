@@ -33,6 +33,7 @@ model Workspace {
   createdAt   DateTime         @default(now())
 
   users       WorkspaceUser[] // 워크스페이스 → 사용자 연결 (다대다 관계)
+  projects    Project[] // 워크스페이스 → 프로젝트 연결 (일대다 관계)
 }
 
 // 워크스페이스 사용자 중개 모델
@@ -53,4 +54,15 @@ model WorkspaceUser {
 enum WorkspaceRole {
   ADMIN
   MEMBER
+}
+
+// 프로젝트 모델
+model Project {
+  id           String     @id @default(cuid())
+  name         String
+  description  String?
+  workspaceId  String
+  createdAt    DateTime   @default(now())
+
+  workspace    Workspace  @relation(fields: [workspaceId], references: [id])
 }
