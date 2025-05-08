@@ -5,12 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-
-type Errors = {
-  email?: string
-  password?: string
-  form?: string
-}
+import { FormErrors } from "@/types"
 
 // 로그인 페이지
 export default function LoginPage() {
@@ -18,14 +13,14 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [errors, setErrors] = useState<Errors>({})
+  const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
 
   // 로그인 요청
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setErrors({})
-    const newErrors: Errors = {}
+    const newErrors: FormErrors = {}
     // 이메일 검증
     if (!email) newErrors.email = "이메일을 입력해주세요."
     else if (!email.includes("@"))

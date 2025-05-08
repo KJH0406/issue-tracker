@@ -6,13 +6,7 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import toast from "react-hot-toast"
-
-type Errors = {
-  email?: string
-  username?: string
-  password?: string
-  form?: string
-}
+import { FormErrors } from "@/types"
 
 // 회원가입 페이지
 export default function SignupPage() {
@@ -22,7 +16,7 @@ export default function SignupPage() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
-  const [errors, setErrors] = useState<Errors>({})
+  const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
 
   // 회원가입 요청
@@ -30,7 +24,7 @@ export default function SignupPage() {
     e.preventDefault()
     setErrors({})
 
-    const newErrors: Errors = {}
+    const newErrors: FormErrors = {}
     // 이메일 검증
     if (!email) newErrors.email = "이메일을 입력해주세요."
     else if (!email.includes("@"))
