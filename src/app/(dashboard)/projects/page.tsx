@@ -1,61 +1,45 @@
 "use client"
 
-import { getProjects } from "@/lib/api/project"
-import { getWorkspaces } from "@/lib/api/workspace"
-import { Workspace } from "@/types/workspace"
-import { Project } from "@prisma/client"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
+import { getProjects } from "@/lib/api/project"
+import { useWorkspaceStore } from "@/stores/workspace"
+import { Project } from "@/types/project"
+import Link from "next/link"
 
 // 프로젝트 목록 페이지
 export default function ProjectListPage() {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
-  const [selectedId, setSelectedId] = useState("")
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(false)
+  const workspace = useWorkspaceStore((state) => state.current)
 
-  // 워크스페이스 목록 조회
   useEffect(() => {
-    const fetchWorkspaces = async () => {
-      const workspaces = await getWorkspaces()
-      setWorkspaces(workspaces)
-    }
-    fetchWorkspaces()
-  }, [])
+    const fetch = async () => {
+      if (!workspace) return
 
-  // 선택된 워크스페이스에 속한 프로젝트 목록 조회
-  useEffect(() => {
-    const fetchProjects = async () => {
-      if (!selectedId) return
       setLoading(true)
       try {
-        const projects = await getProjects(selectedId)
-        setProjects(projects)
+        const data = await getProjects(workspace.id)
+        setProjects(data)
       } catch (err: any) {
         toast.error(err.message)
       } finally {
         setLoading(false)
       }
     }
-    fetchProjects()
-  }, [selectedId])
+
+    fetch()
+  }, [workspace?.id])
 
   return (
     <div className="max-w-3xl mx-auto mt-10 space-y-6">
-      <h1 className="text-2xl font-bold">프로젝트 목록</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">프로젝트 목록</h1>
 
-      <select
-        className="w-full border rounded px-3 py-2 text-sm"
-        value={selectedId}
-        onChange={(e) => setSelectedId(e.target.value)}
-      >
-        <option value="">워크스페이스 선택</option>
-        {workspaces.map((ws) => (
-          <option key={ws.id} value={ws.id}>
-            {ws.name}
-          </option>
-        ))}
-      </select>
+        <Link href="/projects/new">
+          <div className="font-semibold text-blue-500">프로젝트 생성하기</div>
+        </Link>
+      </div>
 
       {loading ? (
         <p>불러오는 중...</p>
