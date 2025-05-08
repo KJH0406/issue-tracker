@@ -1,19 +1,11 @@
 "use client"
 
 import { getProjects } from "@/lib/api/project"
+import { getWorkspaces } from "@/lib/api/workspace"
+import { Workspace } from "@/types/workspace"
+import { Project } from "@prisma/client"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-
-type Workspace = {
-  id: string
-  name: string
-}
-
-type Project = {
-  id: string
-  name: string
-  description: string | null
-}
 
 // 프로젝트 목록 페이지
 export default function ProjectListPage() {
@@ -25,9 +17,8 @@ export default function ProjectListPage() {
   // 워크스페이스 목록 조회
   useEffect(() => {
     const fetchWorkspaces = async () => {
-      const res = await fetch("/api/workspaces")
-      const data = await res.json()
-      setWorkspaces(data.workspaces)
+      const workspaces = await getWorkspaces()
+      setWorkspaces(workspaces)
     }
     fetchWorkspaces()
   }, [])

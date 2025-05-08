@@ -6,11 +6,8 @@ import { toast } from "react-hot-toast"
 import { createProject } from "@/lib/api/project"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-
-type Workspace = {
-  id: string
-  name: string
-}
+import { Workspace } from "@/types/workspace"
+import { getWorkspaces } from "@/lib/api/workspace"
 
 // 새 프로젝트 생성 페이지
 export default function NewProjectPage() {
@@ -24,9 +21,8 @@ export default function NewProjectPage() {
   // 워크스페이스 목록 조회
   useEffect(() => {
     const fetchWorkspaces = async () => {
-      const res = await fetch("/api/workspaces")
-      const data = await res.json()
-      setWorkspaces(data.workspaces)
+      const workspaces = await getWorkspaces()
+      setWorkspaces(workspaces)
     }
 
     fetchWorkspaces()

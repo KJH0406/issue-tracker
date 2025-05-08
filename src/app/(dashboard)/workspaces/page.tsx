@@ -3,14 +3,7 @@
 import { getWorkspaces } from "@/lib/api/workspace"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-
-type Workspace = {
-  id: string
-  name: string
-  description: string | null
-  role: "ADMIN" | "MEMBER"
-  createdAt: string
-}
+import { Workspace } from "@/types/workspace"
 
 // 워크스페이스 목록 페이지
 export default function WorkspaceListPage() {
