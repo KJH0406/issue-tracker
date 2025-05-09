@@ -14,11 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+import { usePathname } from "next/navigation"
 
 // 헤더 컴포넌트
 export function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const [username, setUsername] = useState("")
 
   useEffect(() => {
@@ -45,14 +46,16 @@ export function Header() {
 
   return (
     <header className="w-full px-6 py-3 border-b flex justify-between items-center bg-white shadow-sm sticky top-0 z-10">
-      {/* 왼쪽: 서비스명 및 워크스페이스 선택 */}
+      {/* 왼쪽: 서비스명 및 공간 선택 */}
       <div className="flex items-center gap-4">
         <div className="text-xl font-bold text-primary flex items-center">
           Issue Tracker
         </div>
-        <div className="ml-6">
-          <WorkspaceSelector />
-        </div>
+        {pathname.includes("/workspace/") && (
+          <div className="ml-6">
+            <WorkspaceSelector />
+          </div>
+        )}
       </div>
 
       {/* 중앙: 검색창 */}

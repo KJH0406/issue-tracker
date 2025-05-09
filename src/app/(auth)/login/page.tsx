@@ -49,7 +49,7 @@ export default function LoginPage() {
         return
       }
       // 로그인 성공 시 홈 페이지로 리다이렉트
-      router.push("/")
+      router.push("/workspace")
     } catch {
       setErrors({ form: "서버와 통신 중 오류가 발생했습니다." })
       setLoading(false)

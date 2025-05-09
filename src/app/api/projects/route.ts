@@ -10,35 +10,47 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    const { name, description, workspaceId } = await req.json()
+    const { name, slug, description, workspaceSlug } = await req.json()
 
-    if (!name || !workspaceId) {
+    if (!name || !slug || !workspaceSlug) {
       return NextResponse.json(
-        { message: "이름과 워크스페이스 ID는 필수입니다." },
+        { message: "이름, 식별자, 공간 식별자는 필수입니다." },
         { status: 400 }
       )
     }
 
-    // 사용자가 해당 워크스페이스의 멤버인지 확인
+    // 사용자가 해당 공간의 멤버인지 확인
     const isMember = await prisma.workspaceUser.findFirst({
       where: {
         userId: user.userId,
-        workspaceId,
+        workspace: { slug: workspaceSlug },
       },
     })
 
     if (!isMember) {
       return NextResponse.json(
-        { message: "워크스페이스 권한이 없습니다." },
+        { message: "공간 접근 권한이 없습니다." },
         { status: 403 }
+      )
+    }
+
+    // 프로젝트 식별자 중복 검증
+    const existingProject = await prisma.project.findUnique({
+      where: { slug },
+    })
+    if (existingProject) {
+      return NextResponse.json(
+        { message: "이미 존재하는 프로젝트 식별자입니다." },
+        { status: 400 }
       )
     }
 
     const project = await prisma.project.create({
       data: {
         name,
+        slug,
         description,
-        workspaceId,
+        workspace: { connect: { slug: workspaceSlug } },
       },
     })
 
@@ -50,8 +62,6 @@ export async function POST(req: NextRequest) {
 }
 
 // 프로젝트 목록 조회 API
-// src/app/api/projects/route.ts
-
 export async function GET(req: NextRequest) {
   try {
     const user = await getAuthUser()
@@ -59,36 +69,36 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    // 워크스페이스 ID 추출
+    // 공간 ID 추출
     const { searchParams } = new URL(req.url)
-    const workspaceId = searchParams.get("workspaceId")
+    const workspaceSlug = searchParams.get("workspaceSlug")
 
-    if (!workspaceId) {
+    if (!workspaceSlug) {
       return NextResponse.json(
-        { message: "workspaceId가 필요합니다." },
+        { message: "공간 식별자가 필요합니다." },
         { status: 400 }
       )
     }
 
-    // 유저가 이 워크스페이스에 속한지 확인
+    // 유저가 이 공간에 속한지 확인
     const isMember = await prisma.workspaceUser.findFirst({
       where: {
         userId: user.userId,
-        workspaceId,
+        workspace: { slug: workspaceSlug },
       },
     })
 
     // 유저 접근 권한 확인
     if (!isMember) {
       return NextResponse.json(
-        { message: "워크스페이스 접근 권한이 없습니다." },
+        { message: "공간 접근 권한이 없습니다." },
         { status: 403 }
       )
     }
 
     // 프로젝트 목록 조회
     const projects = await prisma.project.findMany({
-      where: { workspaceId },
+      where: { workspace: { slug: workspaceSlug } },
       orderBy: { createdAt: "desc" }, // 최신 순으로 정렬
     })
 

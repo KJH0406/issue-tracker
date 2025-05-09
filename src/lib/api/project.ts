@@ -1,8 +1,9 @@
 // 프로젝트 생성 API
 export async function createProject(data: {
   name: string
+  slug: string
   description?: string
-  workspaceId: string
+  workspaceSlug: string
 }) {
   const res = await fetch("/api/projects", {
     method: "POST",
@@ -16,8 +17,8 @@ export async function createProject(data: {
 }
 
 // 프로젝트 목록 조회 API
-export async function getProjects(workspaceId: string) {
-  const res = await fetch(`/api/projects?workspaceId=${workspaceId}`)
+export async function getProjects(workspaceSlug: string) {
+  const res = await fetch(`/api/projects?workspaceSlug=${workspaceSlug}`)
   const json = await res.json()
   if (!res.ok) throw new Error(json.message || "프로젝트 목록 불러오기 실패")
   return json.projects
