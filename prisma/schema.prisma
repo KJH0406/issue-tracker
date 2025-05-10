@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -69,6 +68,7 @@ model Project {
 // 이슈 모델
 model Issue {
   id          String   @id @default(cuid())
+  number      Int?      
   title       String
   description String?
   createdAt   DateTime @default(now())
@@ -78,4 +78,6 @@ model Issue {
 
   authorId    String
   author      User @relation(fields: [authorId], references: [id])
+
+  @@unique([projectId, number]) // 프로젝트 내 이슈 숫자 중복 방지
 }
