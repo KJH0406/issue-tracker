@@ -7,6 +7,8 @@ import { IssueList } from "@/components/issue/IssueList"
 import { IssueCreateModal } from "@/components/issue/IssueCreateModal"
 import { getIssues } from "@/lib/api/issue"
 import { Issue } from "@/types/issue"
+import { PlusIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 // 프로젝트 홈 페이지
 export default function ProjectHomePage() {
@@ -16,6 +18,8 @@ export default function ProjectHomePage() {
   const [issues, setIssues] = useState<Issue[]>([])
   // 로딩 상태 관리
   const [loading, setLoading] = useState(true)
+  // 모달 열기 상태
+  const [isOpen, setIsOpen] = useState(false)
 
   // 이슈 목록 불러오기
   useEffect(() => {
@@ -44,23 +48,33 @@ export default function ProjectHomePage() {
 
   return (
     <div className="space-y-6 mx-auto py-10 w-full">
+      {/* 이슈 목록 헤더 */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">프로젝트 이슈</h1>
-        {/* 이슈 목록 */}
-        <IssueList
-          issues={issues}
-          loading={loading}
-          workspaceSlug={workspaceSlug as string}
-          projectSlug={projectSlug as string}
-        />
-
-        {/* 이슈 생성 모달 */}
-        <IssueCreateModal
-          workspaceSlug={workspaceSlug as string}
-          projectSlug={projectSlug as string}
-          onCreated={handleIssueCreated}
-        />
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="flex items-center gap-1"
+        >
+          <PlusIcon className="w-4 h-4" />새 이슈 생성
+        </Button>
       </div>
+
+      {/* 이슈 목록 */}
+      <IssueList
+        issues={issues}
+        loading={loading}
+        projectSlug={projectSlug as string}
+        workspaceSlug={workspaceSlug as string}
+      />
+
+      {/* 이슈 생성 모달 */}
+      <IssueCreateModal
+        workspaceSlug={workspaceSlug as string}
+        projectSlug={projectSlug as string}
+        onCreated={handleIssueCreated}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
     </div>
   )
 }

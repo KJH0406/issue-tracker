@@ -15,17 +15,18 @@ export function IssueCreateModal({
   workspaceSlug,
   projectSlug,
   onCreated,
+  isOpen,
+  setIsOpen,
 }: {
   workspaceSlug: string
   projectSlug: string
   onCreated?: (newIssue: Issue) => void
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
 }) {
   // 이슈 폼 데이터
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-
-  // 모달 열기 상태
-  const [isOpen, setIsOpen] = useState(false)
 
   // 이슈 생성 로딩 상태
   const [loading, setLoading] = useState(false)
