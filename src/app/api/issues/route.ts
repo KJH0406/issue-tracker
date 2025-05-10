@@ -6,7 +6,6 @@ import { prisma } from "@/lib/prisma"
 export async function POST(req: NextRequest) {
   try {
     const user = await getAuthUser()
-
     if (!user) {
       return NextResponse.json(
         { message: "인증되지 않았습니다." },
@@ -14,23 +13,35 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 이슈 생성 요청 데이터 추출
-    const { title, description, projectId } = await req.json()
+    // 이슈 생성 요청 데이터 파싱
+    const { title, description, workspaceSlug, projectSlug } = await req.json()
 
-    // 제목과 프로젝트 ID는 필수
-    if (!title || !projectId) {
+    // 이슈 생성 요청 데이터 검증
+    if (!title || !workspaceSlug || !projectSlug) {
       return NextResponse.json(
-        { message: "제목과 프로젝트 ID는 필수입니다." },
+        { message: "title, workspaceSlug, projectSlug는 필수입니다." },
         { status: 400 }
       )
     }
 
-    // 프로젝트 조회
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
+    // 워크스페이스 조회
+    const workspace = await prisma.workspace.findUnique({
+      where: { slug: workspaceSlug },
     })
+    if (!workspace) {
+      return NextResponse.json(
+        { message: "워크스페이스를 찾을 수 없습니다." },
+        { status: 404 }
+      )
+    }
 
-    // 프로젝트가 존재하지 않으면 404 오류 반환
+    // 프로젝트 조회
+    const project = await prisma.project.findFirst({
+      where: {
+        slug: projectSlug,
+        workspaceId: workspace.id,
+      },
+    })
     if (!project) {
       return NextResponse.json(
         { message: "프로젝트를 찾을 수 없습니다." },
@@ -38,18 +49,18 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 유저가 프로젝트의 워크스페이스에 속한 멤버인지 확인
+    // 권한 확인
     const isMember = await prisma.workspaceUser.findFirst({
       where: {
         userId: user.userId,
-        workspaceId: project.workspaceId,
+        workspaceId: workspace.id,
       },
     })
 
-    // 유저가 프로젝트의 워크스페이스에 속한 멤버가 아니면 403 오류 반환
+    // 권한 확인 실패 시 403 오류 반환
     if (!isMember) {
       return NextResponse.json(
-        { message: "프로젝트 접근 권한이 없습니다." },
+        { message: "워크스페이스 접근 권한이 없습니다." },
         { status: 403 }
       )
     }
@@ -59,15 +70,15 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         description,
-        projectId,
         authorId: user.userId,
+        projectId: project.id,
       },
     })
 
-    // 이슈 생성 성공 이슈 데이터 반환
+    // 이슈 생성 성공 시 이슈 데이터 반환
     return NextResponse.json({ issue }, { status: 201 })
-  } catch (err) {
-    console.error("이슈 생성 오류:", err)
+  } catch (error) {
+    console.error("이슈 생성 오류:", error)
     return NextResponse.json({ message: "서버 오류 발생" }, { status: 500 })
   }
 }
