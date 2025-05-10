@@ -118,12 +118,14 @@ model Project {
   createdAt    DateTime   @default(now())
 
   workspace    Workspace  @relation(fields: [workspaceId], references: [id])
+  issues       Issue[] // 프로젝트 → 이슈 연결 (일대다 관계)
 }
 ```
 
 - 프로젝트는 하나의 워크스페이스에 소속됨 (`workspaceId`)
 - `workspace` 관계 필드를 통해 해당 프로젝트의 워크스페이스 정보 조회 가능
   → 예: `include: { workspace: true }`
+- `issues` 관계 필드를 통해 해당 프로젝트의 이슈 목록 조회 가능
 
 <details>
 <summary>include 사용 예시</summary>
@@ -172,4 +174,34 @@ model Project {
 
 ---
 
-## 4. 이슈 모델 _(추가 예정)_
+## 4. 이슈 모델
+
+```prisma
+model Issue {
+  id          String   @id @default(cuid())
+  number      Int
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id])
+
+  authorId    String
+  author      User @relation(fields: [authorId], references: [id])
+
+  @@unique([projectId, number]) // 프로젝트 내 이슈 번호 중복 방지
+}
+```
+
+- 이슈는 하나의 프로젝트에 속함
+- `project` 관계 필드를 통해 해당 이슈의 프로젝트 정보 조회 가능
+- `author` 관계 필드를 통해 해당 이슈의 작성자 정보 조회 가능
+- `@@unique([projectId, number])` 제약 조건을 통해 프로젝트 내 이슈 번호 중복 방지
+
+---
+
+### 💡 중요 포인트: 이슈 번호 중복 방지
+
+- 이슈 번호는 프로젝트 내에서 유일해야 함
+- 이슈 생성 시 이슈 번호를 자동으로 부여하고, 이슈 번호가 중복되는 경우 오류 발생
