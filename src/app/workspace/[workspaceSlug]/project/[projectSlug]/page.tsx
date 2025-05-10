@@ -47,7 +47,7 @@ export default function ProjectHomePage() {
   }
 
   return (
-    <div className="space-y-6 mx-auto py-10 w-full">
+    <div className="space-y-6 mx-auto w-full">
       {/* 이슈 목록 헤더 */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">프로젝트 이슈</h1>

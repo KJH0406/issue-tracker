@@ -65,13 +65,6 @@ export function IssueCreateModal({
 
   return (
     <div>
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="flex items-center gap-1"
-      >
-        <PlusIcon className="w-4 h-4" />새 이슈 생성
-      </Button>
-
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
