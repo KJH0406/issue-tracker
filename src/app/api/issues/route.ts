@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getAuthUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
-// 이슈 생성
+// 이슈 생성 API
 export async function POST(req: NextRequest) {
   try {
     const user = await getAuthUser()
@@ -49,12 +49,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 이슈 번호 조회
+    // 이슈 번호 조회 (* 이슈 번호 할당 시 사용)
     const lastIssue = await prisma.issue.findFirst({
       where: { projectId: project.id },
       orderBy: { number: "desc" },
     })
 
+    // 이슈 번호 할당
     const nextNumber = lastIssue ? lastIssue.number + 1 : 1
 
     // 권한 확인
@@ -81,6 +82,9 @@ export async function POST(req: NextRequest) {
         description,
         authorId: user.userId,
         projectId: project.id,
+      },
+      include: {
+        author: true,
       },
     })
 
