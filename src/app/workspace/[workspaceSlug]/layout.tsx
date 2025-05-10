@@ -1,19 +1,21 @@
-import { Header } from "@/components/layout/Header"
+import { ReactNode } from "react"
+import { redirect } from "next/navigation"
+
 import { Sidebar } from "@/components/layout/Sidebar"
 import { getAuthUser } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import { ReactNode } from "react"
 
-// 공간 레이아웃
-export default async function WorkspaceLayout({
+// 공간 홈 레이아웃
+export default async function WorkspaceHomeLayout({
   children,
 }: {
   children: ReactNode
 }) {
+  // 로그인 사용자 조회
   const user = await getAuthUser()
 
   // 인증된 사용자가 아니면 로그인 페이지로 리다이렉트
   if (!user) redirect("/login")
+
   return (
     <div className="h-screen flex flex-col">
       <div className="flex flex-1 overflow-hidden">
