@@ -2,26 +2,33 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
+
 import { Workspace } from "@/types/workspace"
 import { getWorkspaces } from "@/lib/api/workspace"
 import { WorkspaceCreateModal } from "./WorkspaceCreateModal"
 
 // 공간 셀렉터
 export function WorkspaceSelector() {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
-  const [isOpen, setIsOpen] = useState(false)
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const router = useRouter()
   const params = useParams()
+
+  // 공간 데이터 상태
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const currentSlug = params.workspaceSlug as string
   const current = workspaces.find((ws) => ws.slug === currentSlug)
+
+  // 공간 셀렉터 상태
+  const [isOpen, setIsOpen] = useState(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   // 공간 데이터 가져오기
   const fetchWorkspaces = async () => {
     const workspaces = await getWorkspaces()
+    // 공간 목록 상태 업데이트
     setWorkspaces(workspaces)
   }
 
+  // 페이지 로드 시 공간 목록 가져오기
   useEffect(() => {
     fetchWorkspaces()
   }, [])
@@ -34,13 +41,17 @@ export function WorkspaceSelector() {
         fetchWorkspaces()
       }
     }
-  }, [currentSlug, workspaces])
+  }, [currentSlug, workspaces]) // 식별자, 공간 목록 상태 변경 시 공간 목록 다시 가져오기
 
+  // 공간 선택 핸들러
   const handleSelect = (selectedSlug: string) => {
+    // 선택된 공간 찾기
     const selected = workspaces.find((ws) => ws.slug === selectedSlug)
     if (selected) {
+      // 선택된 공간으로 이동
       router.push(`/workspace/${selected.slug}`)
     }
+    // 드롭다운 닫기
     setIsOpen(false)
   }
 
@@ -53,10 +64,11 @@ export function WorkspaceSelector() {
   const handleWorkspaceCreated = (newWorkspace: Workspace) => {
     // 새 공간를 목록에 추가
     setWorkspaces((prev) => [...prev, newWorkspace])
+    // 생성 모달 닫기
     setIsCreateModalOpen(false)
   }
 
-  // 외부 클릭 시 드롭다운 닫기
+  // 외부 클릭 시 공간 셀렉터 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
@@ -73,6 +85,7 @@ export function WorkspaceSelector() {
 
   return (
     <div className="workspace-selector relative inline-block min-w-[200px]">
+      {/* 공간 셀렉터 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -97,8 +110,10 @@ export function WorkspaceSelector() {
         </svg>
       </button>
 
+      {/* 공간 셀렉터 드롭다운 */}
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+          {/* 공간 목록 */}
           <ul className="py-1 max-h-48 overflow-y-auto">
             {workspaces.map((ws) => (
               <li
@@ -114,7 +129,17 @@ export function WorkspaceSelector() {
               </li>
             ))}
           </ul>
+
+          {/* 공간이 없는 경우 */}
+          {workspaces.length === 0 && (
+            <div className="px-4 py-2 text-sm text-gray-500">
+              공간이 없습니다.
+            </div>
+          )}
+
+          {/* 드롭다운 하단 버튼 그룹*/}
           <div className="border-t border-gray-200">
+            {/* 공간 생성 버튼 */}
             <button
               onClick={handleCreateWorkspace}
               className="w-full px-4 py-2.5 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center hover:bg-gray-50 focus:outline-none focus:bg-gray-100"
@@ -135,6 +160,8 @@ export function WorkspaceSelector() {
               </svg>
               공간 생성하기
             </button>
+
+            {/* 공간 목록 보기 버튼 */}
             <button
               onClick={() => router.push("/workspace")}
               className="w-full px-4 py-2.5 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center hover:bg-gray-50 focus:outline-none focus:bg-gray-100"
@@ -158,6 +185,8 @@ export function WorkspaceSelector() {
           </div>
         </div>
       )}
+
+      {/* 공간 생성 모달 */}
       {isCreateModalOpen && (
         <WorkspaceCreateModal
           isOpen={isCreateModalOpen}

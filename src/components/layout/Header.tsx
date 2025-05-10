@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { WorkspaceSelector } from "@/components/workspace/WorkspaceSelector"
+import { useRouter, usePathname } from "next/navigation"
+
 import { Bell, Search, HelpCircle, Settings, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { WorkspaceSelector } from "@/components/workspace/WorkspaceSelector"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,16 +15,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { usePathname } from "next/navigation"
 
 // 헤더 컴포넌트
 export function Header() {
   const router = useRouter()
-  const pathname = usePathname()
-  const [username, setUsername] = useState("")
+  const pathname = usePathname() // 현재 경로
+  const [username, setUsername] = useState("") // 사용자 이름
 
+  // 사용자 정보 가져오기
   useEffect(() => {
-    // 사용자 정보 가져오기
     const fetchUserInfo = async () => {
       try {
         const res = await fetch("/api/user")
@@ -36,21 +36,27 @@ export function Header() {
       }
     }
 
+    // 페이지 로드 시 사용자 정보 가져오기
     fetchUserInfo()
   }, [])
 
+  // 로그아웃 처리
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST" })
+    // 로그아웃 이후 로그인 페이지로 리다이렉트
     router.push("/login")
   }
 
   return (
     <header className="w-full px-6 py-3 border-b flex justify-between items-center bg-white shadow-sm sticky top-0 z-10">
-      {/* 왼쪽: 서비스명 및 공간 선택 */}
+      {/* 서비스명 및 공간 셀렉터 */}
       <div className="flex items-center gap-4">
+        {/* 서비스명 */}
         <div className="text-xl font-bold text-primary flex items-center">
           Issue Tracker
         </div>
+
+        {/* 공간 셀렉터 */}
         {pathname.includes("/workspace/") && (
           <div className="ml-6">
             <WorkspaceSelector />
@@ -69,19 +75,25 @@ export function Header() {
         </div>
       </div> */}
 
-      {/* 오른쪽: 아이콘 및 프로필 */}
+      {/* 부가 기능 영역 */}
       <div className="flex items-center gap-2">
+        {/* 도움말 버튼 */}
         <Button variant="ghost" size="icon" className="text-gray-500">
           <HelpCircle className="h-5 w-5" />
         </Button>
+
+        {/* 알림 버튼 */}
         <Button variant="ghost" size="icon" className="text-gray-500 relative">
           <Bell className="h-5 w-5" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
         </Button>
+
+        {/* 설정 버튼 */}
         <Button variant="ghost" size="icon" className="text-gray-500">
           <Settings className="h-5 w-5" />
         </Button>
 
+        {/* 프로필 버튼 */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">

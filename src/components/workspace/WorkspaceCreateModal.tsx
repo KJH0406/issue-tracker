@@ -1,4 +1,10 @@
 import React, { useState } from "react"
+import { useRouter } from "next/navigation"
+
+import { Workspace } from "@/types/workspace"
+import { createWorkspace } from "@/lib/api/workspace"
+
+import { toast } from "react-hot-toast"
 import {
   Dialog,
   DialogOverlay,
@@ -6,10 +12,6 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog"
-import { createWorkspace } from "@/lib/api/workspace"
-import { useRouter } from "next/navigation"
-import { toast } from "react-hot-toast"
-import { Workspace } from "@/types/workspace"
 
 // 공간 생성 모달
 export function WorkspaceCreateModal({
@@ -22,18 +24,24 @@ export function WorkspaceCreateModal({
   onWorkspaceCreated: (workspace: Workspace) => void
 }) {
   const router = useRouter()
+
+  // 공간 생성 폼 데이터
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [description, setDescription] = useState("")
+
+  // 공간 생성 처리 관련 상태
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // 공간 생성 폼 제출
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
 
     try {
+      // 공간 생성 API 호출
       const newWorkspace = await createWorkspace({
         name,
         slug,

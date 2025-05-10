@@ -1,4 +1,10 @@
 import React, { useState } from "react"
+import { useRouter } from "next/navigation"
+
+import { Project } from "@/types/project"
+import { createProject } from "@/lib/api/project"
+
+import { toast } from "react-hot-toast"
 import {
   Dialog,
   DialogOverlay,
@@ -6,10 +12,6 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog"
-import { useRouter } from "next/navigation"
-import { toast } from "react-hot-toast"
-import { Project } from "@/types/project"
-import { createProject } from "@/lib/api/project"
 
 // 프로젝트 생성 모달
 export function ProjectCreateModal({
@@ -24,18 +26,24 @@ export function ProjectCreateModal({
   workspaceSlug: string
 }) {
   const router = useRouter()
+
+  // 프로젝트 생성 폼 데이터
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [description, setDescription] = useState("")
+
+  // 프로젝트 생성 처리 관련 상태
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // 프로젝트 생성 폼 제출
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
 
     try {
+      // 프로젝트 생성 API 호출
       const newProject = await createProject({
         name,
         slug,
