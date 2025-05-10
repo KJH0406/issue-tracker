@@ -35,7 +35,7 @@ export default function ProjectHomePage() {
     }
 
     fetchIssues()
-  }, [workspaceSlug, projectSlug])
+  }, [])
 
   // 이슈 생성 후 목록에 직접 추가
   const handleIssueCreated = (newIssue: Issue) => {
@@ -46,20 +46,21 @@ export default function ProjectHomePage() {
     <div className="space-y-6 mx-auto py-10 w-full">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">프로젝트 이슈</h1>
+        {/* 이슈 목록 */}
+        <IssueList
+          issues={issues}
+          loading={loading}
+          workspaceSlug={workspaceSlug as string}
+          projectSlug={projectSlug as string}
+        />
+
+        {/* 이슈 생성 모달 */}
         <IssueCreateModal
           workspaceSlug={workspaceSlug as string}
           projectSlug={projectSlug as string}
           onCreated={handleIssueCreated}
         />
       </div>
-
-      {/* 이슈 목록 */}
-      <IssueList
-        issues={issues}
-        loading={loading}
-        projectSlug={projectSlug as string}
-        workspaceSlug={workspaceSlug as string}
-      />
     </div>
   )
 }
