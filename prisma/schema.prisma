@@ -68,7 +68,7 @@ model Project {
 // 이슈 모델
 model Issue {
   id          String   @id @default(cuid())
-  number      Int?      
+  number      Int      
   title       String
   description String?
   createdAt   DateTime @default(now())
