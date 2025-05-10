@@ -1,7 +1,9 @@
-import { Header } from "@/components/layout/Header"
-import { getAuthUser } from "@/lib/auth"
-import { redirect } from "next/navigation"
 import { ReactNode } from "react"
+import { redirect } from "next/navigation"
+
+import { getAuthUser } from "@/lib/auth"
+
+import { Header } from "@/components/layout/Header"
 
 // 공간 루트 레이아웃
 export default async function WorkspaceRootLayout({
