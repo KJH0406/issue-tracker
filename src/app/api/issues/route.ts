@@ -155,6 +155,9 @@ export async function GET(req: NextRequest) {
   const issues = await prisma.issue.findMany({
     where: { projectId: project.id },
     orderBy: { createdAt: "desc" },
+    include: {
+      author: true,
+    },
   })
 
   // 이슈 목록 반환

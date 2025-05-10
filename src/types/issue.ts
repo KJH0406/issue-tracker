@@ -6,4 +6,7 @@ export type Issue = {
   createdAt: string
   projectId: string
   authorId: string
+  author: {
+    username: string
+  }
 }
