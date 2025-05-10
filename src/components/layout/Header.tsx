@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-
+import Link from "next/link"
 import { Bell, Search, HelpCircle, Settings, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -52,9 +52,12 @@ export function Header() {
       {/* 서비스명 및 공간 셀렉터 */}
       <div className="flex items-center gap-4">
         {/* 서비스명 */}
-        <div className="text-xl font-bold text-primary flex items-center">
+        <Link
+          href="/workspace"
+          className="text-xl font-bold text-primary flex items-center"
+        >
           Issue Tracker
-        </div>
+        </Link>
 
         {/* 공간 셀렉터 */}
         {pathname.includes("/workspace/") && (
