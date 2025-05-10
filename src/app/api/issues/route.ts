@@ -49,6 +49,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // 이슈 번호 조회
+    const lastIssue = await prisma.issue.findFirst({
+      where: { projectId: project.id },
+      orderBy: { number: "desc" },
+    })
+
+    const nextNumber = lastIssue ? lastIssue.number + 1 : 1
+
     // 권한 확인
     const isMember = await prisma.workspaceUser.findFirst({
       where: {
@@ -69,6 +77,7 @@ export async function POST(req: NextRequest) {
     const issue = await prisma.issue.create({
       data: {
         title,
+        number: nextNumber,
         description,
         authorId: user.userId,
         projectId: project.id,

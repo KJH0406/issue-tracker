@@ -43,7 +43,7 @@ export default function ProjectHomePage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto py-10">
+    <div className="space-y-6 mx-auto py-10 w-full">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">프로젝트 이슈</h1>
         <IssueCreateModal
@@ -54,7 +54,12 @@ export default function ProjectHomePage() {
       </div>
 
       {/* 이슈 목록 */}
-      <IssueList issues={issues} loading={loading} />
+      <IssueList
+        issues={issues}
+        loading={loading}
+        projectSlug={projectSlug as string}
+        workspaceSlug={workspaceSlug as string}
+      />
     </div>
   )
 }

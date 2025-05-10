@@ -1,16 +1,23 @@
 "use client"
 
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Link } from "lucide-react"
 import { Issue } from "@/types/issue"
+import { useRouter } from "next/navigation"
 
 // 이슈 목록 컴포넌트
 export function IssueList({
   issues,
   loading,
+  projectSlug,
+  workspaceSlug,
 }: {
   issues: Issue[]
   loading: boolean
+  projectSlug: string
+  workspaceSlug: string
 }) {
+  const router = useRouter()
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
@@ -34,10 +41,11 @@ export function IssueList({
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="border rounded-lg overflow-hidden w-full">
       <div className="bg-gray-100 px-6 py-3 border-b">
         <div className="grid grid-cols-12 gap-4 font-medium text-sm text-gray-600">
-          <div className="col-span-7">제목</div>
+          <div className="col-span-1">일감 번호</div>
+          <div className="col-span-5">제목</div>
           <div className="col-span-3">생성일</div>
           <div className="col-span-2">생성자</div>
         </div>
@@ -54,9 +62,20 @@ export function IssueList({
           )
 
           return (
-            <li key={issue.id} className="hover:bg-gray-50 transition-colors">
+            <li
+              key={issue.id}
+              className="hover:bg-gray-50 transition-colors cursor-pointer"
+              onClick={() => {
+                router.push(
+                  `/workspace/${workspaceSlug}/project/${projectSlug}/issue/${issue.number}`
+                )
+              }}
+            >
               <div className="px-6 py-4 grid grid-cols-12 gap-4 items-center">
-                <div className="col-span-7">
+                <div className="col-span-1 text-sm text-gray-500">
+                  #{projectSlug}-{issue.number}
+                </div>
+                <div className="col-span-5">
                   <h3 className="font-medium text-gray-900">{issue.title}</h3>
                   {issue.description && (
                     <p className="text-sm text-gray-500 mt-1 line-clamp-1">

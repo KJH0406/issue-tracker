@@ -88,7 +88,7 @@ export function Sidebar() {
               <div className="space-y-1">
                 {projects.map((project) => {
                   const href = `/workspace/${workspaceSlug}/project/${project.slug}`
-                  const isActive = pathname === href
+                  const isActive = pathname.includes(href)
 
                   return (
                     <Link
