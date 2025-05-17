@@ -70,41 +70,81 @@ export function IssueDetail() {
     router.push(`/workspace/${workspaceSlug}/project/${projectSlug}`)
   }
   return (
-    <div className="max-w-3xl mx-auto py-10 space-y-6">
-      <button
-        onClick={goBackToIssueList}
-        className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4 cursor-pointer"
-      >
-        <ArrowLeft className="w-4 h-4 mr-1" />
-        이슈 목록으로 돌아가기
-      </button>
-      <h1 className="text-2xl font-bold">{issue.title}</h1>
-      <div className="text-sm text-gray-500 space-x-2">
-        #{issue.number} · {issue.author?.username || "알 수 없음"}
-        <span
-          className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}
+    <div className="max-w-4xl mx-auto py-6 space-y-6">
+      {/* 헤더 영역 - 뒤로가기 버튼 */}
+      <div className="flex items-center">
+        <button
+          onClick={goBackToIssueList}
+          className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
         >
-          {status.label}
-        </span>
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          이슈 목록
+        </button>
+      </div>
+      {/* 이슈 번호 */}
+      <span className="text-gray-500 text-sm">
+        #{projectSlug}-{issue.number}
+      </span>
+      {/* 이슈 제목 */}
+      <div className="flex items-center space-x-2">
+        <h1 className="text-2xl font-bold">{issue.title}</h1>
       </div>
 
-      {/* 상태 변경 드롭다운 */}
-      <select
-        value={issue.status}
-        onChange={(e) => handleChangeStatus(e.target.value)}
-        disabled={updating}
-        className="border rounded px-3 py-2"
-      >
-        {Object.values(IssueStatus).map((statusOption) => (
-          <option key={statusOption} value={statusOption}>
-            {statusOption}
-          </option>
-        ))}
-      </select>
+      {/* 메타데이터 그리드 */}
+      <div className="grid grid-cols-2 gap-4 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        {/* 상태 */}
+        <div className="flex items-center">
+          <div className="w-32 text-sm text-gray-500">상태</div>
+          <div>
+            <select
+              value={issue.status}
+              onChange={(e) => handleChangeStatus(e.target.value)}
+              disabled={updating}
+              className={`border rounded-md px-3 py-1.5 text-sm font-medium  focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+            >
+              {Object.values(IssueStatus).map((statusOption) => (
+                <option key={statusOption} value={statusOption}>
+                  {statusOption}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-      <p className="text-gray-700 whitespace-pre-wrap">
-        {issue.description || "설명 없음"}
-      </p>
+        {/* 담당자 */}
+        <div className="flex items-center">
+          <div className="w-32 text-sm text-gray-500">담당자</div>
+          <div className="flex items-center">
+            <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-sm font-medium text-purple-600">
+              {issue.author?.username?.charAt(0) || "?"}
+            </div>
+            <span className="ml-2 text-sm">
+              {issue.author?.username || "미배정"}
+            </span>
+          </div>
+        </div>
+
+        {/* 날짜 */}
+        <div className="flex items-center">
+          <div className="w-32 text-sm text-gray-500">날짜</div>
+          <div className="text-sm">
+            {new Date(issue.createdAt).toLocaleDateString()}
+          </div>
+        </div>
+      </div>
+      {/* 설명 영역 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-sm font-medium text-gray-700 mb-4">설명</h3>
+        <div className="prose prose-sm max-w-none">
+          {issue.description ? (
+            <p className="text-gray-700 whitespace-pre-wrap">
+              {issue.description}
+            </p>
+          ) : (
+            <p className="text-gray-400 italic">설명 없음</p>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
