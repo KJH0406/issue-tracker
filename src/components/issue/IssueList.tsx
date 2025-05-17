@@ -104,11 +104,6 @@ export function IssueList({
                   </td>
                   <td className="px-6 py-4">
                     <h3 className="font-medium text-gray-900">{issue.title}</h3>
-                    {issue.description && (
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-1">
-                        {issue.description}
-                      </p>
-                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
