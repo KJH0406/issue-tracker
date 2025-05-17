@@ -18,6 +18,7 @@ model User {
 
   workspaces WorkspaceUser[] // 사용자 → 공간 연결 (다대다 관계)
   issues     Issue[] // 사용자 → 이슈 연결 (일대다 관계)
+  comments   Comment[] // 사용자 → 댓글 연결 (일대다 관계)
 }
 
 // 공간 모델
@@ -82,6 +83,8 @@ model Issue {
   author      User @relation(fields: [authorId], references: [id])
 
   @@unique([projectId, number]) // 프로젝트 내 이슈 숫자 중복 방지
+
+  comments Comment[] // 이슈 → 댓글 연결 (일대다 관계)
 }
 
 // 이슈 상태
@@ -90,4 +93,19 @@ enum IssueStatus {
   IN_PROGRESS
   DONE
   CANCELLED
+}
+
+
+// 이슈 댓글 모델
+model Comment {
+  id        String   @id @default(cuid())
+  issue     Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  issueId   String
+
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+
+  content   String
+
+  createdAt DateTime @default(now())
 }
