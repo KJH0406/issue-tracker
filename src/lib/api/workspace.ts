@@ -27,3 +27,12 @@ export async function getWorkspaces() {
   if (!res.ok) throw new Error(json.message || "공간 목록 불러오기 실패")
   return json.workspaces // 공간 목록 반환
 }
+
+// 워크스페이스 사용자 역할 조회 API
+export async function getUserWorkspaceRole(workspaceSlug: string) {
+  const res = await fetch(`/api/workspaces/role?workspaceSlug=${workspaceSlug}`)
+
+  const json = await res.json()
+  if (!res.ok) throw new Error(json.message || "역할 정보 불러오기 실패")
+  return json.role
+}
