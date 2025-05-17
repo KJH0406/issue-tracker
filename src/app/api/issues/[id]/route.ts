@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuthUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { IssueStatus } from "@prisma/client"
 
 // 이슈 상태 업데이트
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const user = await getAuthUser()
+
+  const { id } = await context.params
 
   if (!user) {
     return NextResponse.json(
@@ -18,7 +21,7 @@ export async function PATCH(
 
   const { status } = await req.json()
 
-  if (!["TODO", "IN_PROGRESS", "DONE"].includes(status)) {
+  if (!Object.values(IssueStatus).includes(status as IssueStatus)) {
     return NextResponse.json(
       { message: "잘못된 상태 값입니다." },
       { status: 400 }
@@ -27,7 +30,7 @@ export async function PATCH(
 
   // 이슈 조회
   const issue = await prisma.issue.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       project: {
         include: { workspace: true },
@@ -57,8 +60,15 @@ export async function PATCH(
   }
 
   const updated = await prisma.issue.update({
-    where: { id: params.id },
+    where: { id },
     data: { status },
+    include: {
+      author: {
+        select: {
+          username: true,
+        },
+      },
+    },
   })
 
   return NextResponse.json({ issue: updated })

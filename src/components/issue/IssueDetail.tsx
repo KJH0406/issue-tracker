@@ -1,58 +1,74 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
-
+import { useEffect, useState } from "react"
 import { getStatusStyle } from "@/lib/utils"
-import { getIssue } from "@/lib/api/issue"
-import { Issue } from "@/types/issue"
+import { getIssue, updateIssueStatus } from "@/lib/api/issue"
+import { IssueStatus } from "@prisma/client"
+import { ArrowLeft } from "lucide-react"
+import { toast } from "react-hot-toast"
 
 // 이슈 상세 페이지
 export function IssueDetail() {
-  const { workspaceSlug, projectSlug, issueNumber } = useParams()
   const router = useRouter()
-  const [issue, setIssue] = useState<Issue | null>(null)
+  const { workspaceSlug, projectSlug, issueNumber } = useParams()
+  const [issue, setIssue] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
-    // 이슈 상세 조회
     const fetchIssue = async () => {
+      // 이슈 불러오기
       try {
         const issue = await getIssue(
           Number(issueNumber),
           workspaceSlug as string,
           projectSlug as string
         )
-
-        // 이슈 상세 조회 성공 시 이슈 데이터 설정
         setIssue(issue)
       } catch (err: any) {
-        // 이슈 상세 조회 실패 시 오류 설정
         setError(err.message)
       } finally {
-        // 이슈 상세 조회 완료 시 로딩 상태 설정
         setLoading(false)
       }
     }
 
-    // 이슈 상세 조회 실행
     fetchIssue()
   }, [workspaceSlug, projectSlug, issueNumber])
 
-  // 이슈 목록으로 돌아가는 함수
-  const goBackToIssueList = () => {
-    router.push(`/workspace/${workspaceSlug}/project/${projectSlug}`)
+  // 이슈 상태 변경
+  const handleChangeStatus = async (newStatus: string) => {
+    if (!issue) return
+    setUpdating(true)
+    try {
+      const updatedIssue = await updateIssueStatus(
+        issue.id,
+        newStatus as IssueStatus
+      )
+
+      console.log(updatedIssue)
+
+      setIssue(updatedIssue) // 상태 즉시 반영
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      toast.success("이슈 상태가 변경되었습니다.")
+      setUpdating(false)
+    }
   }
 
   if (loading) return <p>이슈 불러오는 중...</p>
   if (error) return <p className="text-red-500">오류: {error}</p>
   if (!issue) return <p>이슈 없음</p>
 
-  // 이슈 상태 스타일 가져오기
+  // 이슈 상태 스타일
   const status = getStatusStyle(issue.status)
 
+  // 이슈 목록으로 돌아가는 함수
+  const goBackToIssueList = () => {
+    router.push(`/workspace/${workspaceSlug}/project/${projectSlug}`)
+  }
   return (
     <div className="max-w-3xl mx-auto py-10 space-y-6">
       <button
@@ -63,14 +79,29 @@ export function IssueDetail() {
         이슈 목록으로 돌아가기
       </button>
       <h1 className="text-2xl font-bold">{issue.title}</h1>
-      <div className="text-sm text-gray-500">
-        #{issue.number} · {issue.author?.username || "알 수 없음"} ·{" "}
+      <div className="text-sm text-gray-500 space-x-2">
+        #{issue.number} · {issue.author?.username || "알 수 없음"}
         <span
           className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}
         >
           {status.label}
         </span>
       </div>
+
+      {/* 상태 변경 드롭다운 */}
+      <select
+        value={issue.status}
+        onChange={(e) => handleChangeStatus(e.target.value)}
+        disabled={updating}
+        className="border rounded px-3 py-2"
+      >
+        {Object.values(IssueStatus).map((statusOption) => (
+          <option key={statusOption} value={statusOption}>
+            {statusOption}
+          </option>
+        ))}
+      </select>
+
       <p className="text-gray-700 whitespace-pre-wrap">
         {issue.description || "설명 없음"}
       </p>

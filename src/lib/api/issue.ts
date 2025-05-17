@@ -1,4 +1,5 @@
 import { Issue } from "@/types/issue"
+import { IssueStatus } from "@prisma/client"
 
 // 이슈 생성
 export async function createIssue(data: {
@@ -69,5 +70,24 @@ export async function getIssue(
   }
 
   // 이슈 상세 조회 성공 시 이슈 데이터 반환
+  return json.issue
+}
+
+// 이슈 상태 업데이트
+export async function updateIssueStatus(issueId: string, status: IssueStatus) {
+  const res = await fetch(`/api/issues/${issueId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status }),
+  })
+
+  const json = await res.json()
+
+  if (!res.ok) {
+    throw new Error(json.message || "이슈 상태 업데이트 실패")
+  }
+
   return json.issue
 }
