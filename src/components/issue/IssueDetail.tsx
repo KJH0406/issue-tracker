@@ -9,6 +9,8 @@ import { ArrowLeft, Badge } from "lucide-react"
 import { toast } from "react-hot-toast"
 import { deleteComment, getComments } from "@/lib/api/comment"
 import { createComment } from "@/lib/api/comment"
+import { getUserWorkspaceRole } from "@/lib/api/workspace"
+import { DeleteConfirmModal } from "@/components/common/DeleteConfirmModal"
 
 // 이슈 상세 페이지
 export function IssueDetail() {
@@ -18,12 +20,18 @@ export function IssueDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [updating, setUpdating] = useState(false)
+  const [userRole, setUserRole] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   // 댓글 영역 관련 상태
   const [comments, setComments] = useState<any[]>([])
   const [commentsLoading, setCommentsLoading] = useState(true)
   const [commentContent, setCommentContent] = useState("")
   const [submitting, setSubmitting] = useState(false)
+
+  // 삭제 모달 상태 추가
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchIssue = async () => {
@@ -42,6 +50,33 @@ export function IssueDetail() {
     }
 
     fetchIssue()
+
+    // 사용자 정보 가져오기
+    const fetchUserInfo = async () => {
+      try {
+        const res = await fetch("/api/user")
+        if (res.ok) {
+          const data = await res.json()
+          setUserId(data.id)
+        }
+      } catch (error) {
+        console.error("사용자 정보를 가져오는 중 오류 발생:", error)
+      }
+    }
+
+    fetchUserInfo()
+
+    // 워크스페이스 역할 가져오기
+    const fetchUserRole = async () => {
+      try {
+        const role = await getUserWorkspaceRole(workspaceSlug as string)
+        setUserRole(role)
+      } catch (error) {
+        console.error("역할 정보를 가져오는 중 오류 발생:", error)
+      }
+    }
+
+    fetchUserRole()
   }, [workspaceSlug, projectSlug, issueNumber])
 
   useEffect(() => {
@@ -112,17 +147,36 @@ export function IssueDetail() {
     }
   }
 
-  // 댓글 삭제 함수
-  const handleDeleteComment = async (commentId: string) => {
-    if (!window.confirm("댓글을 삭제하시겠습니까?")) return
+  // 댓글 삭제 함수 수정
+  const handleDeleteComment = async () => {
+    if (!commentToDelete) return
+
     try {
-      await deleteComment(commentId)
+      await deleteComment(commentToDelete)
       toast.success("댓글이 삭제되었습니다.")
       const data = await getComments(issue.id)
       setComments(data)
     } catch (error: any) {
       toast.error(error.message)
     }
+  }
+
+  // 댓글 삭제 모달 열기 함수
+  const openDeleteModal = (commentId: string) => {
+    setCommentToDelete(commentId)
+    setIsDeleteModalOpen(true)
+  }
+
+  // 댓글 삭제 모달 닫기 함수
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setCommentToDelete(null)
+  }
+
+  // 댓글 삭제 권한 확인 함수
+  const canDeleteComment = (comment: any) => {
+    // 작성자이거나 관리자인 경우 삭제 가능
+    return String(comment.authorId) === String(userId)
   }
 
   return (
@@ -224,7 +278,7 @@ export function IssueDetail() {
         ) : comments.length > 0 ? (
           <ul className="space-y-4">
             {comments.map((comment) => (
-              <li key={comment.id} className="border-b pb-2">
+              <li key={comment.id} className="border-b pb-2 relative">
                 <div className="flex items-center space-x-2">
                   <span className="font-medium text-sm">
                     {comment.author?.username || "알 수 없음"}
@@ -236,10 +290,10 @@ export function IssueDetail() {
                 <p className="mt-2 text-sm text-gray-700 whitespace-pre-wrap">
                   {comment.content}
                 </p>
-                {/* 본인인 경우에만 삭제 버튼 */}
-                {String(comment.authorId) === String(issue.authorId) && (
+                {/* 삭제 버튼 수정 - 모달 열기 */}
+                {canDeleteComment(comment) && (
                   <button
-                    onClick={() => handleDeleteComment(comment.id)}
+                    onClick={() => openDeleteModal(comment.id)}
                     className="absolute top-0 right-0 text-xs text-red-500 hover:text-red-700"
                   >
                     삭제
@@ -273,6 +327,16 @@ export function IssueDetail() {
           </div>
         </div>
       </div>
+
+      {/* DeleteConfirmModal 컴포넌트 사용 */}
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDeleteComment}
+        title="댓글 삭제"
+        description="댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        resourceType="댓글"
+      />
     </div>
   )
 }
