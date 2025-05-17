@@ -13,7 +13,7 @@ export async function getAuthUser() {
   // 토큰 검증
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-    return decoded as { userId: string }
+    return decoded as { userId: string; role: string }
   } catch {
     return null
   }
