@@ -131,10 +131,10 @@ export function IssueDetail() {
       <div className="flex items-center">
         <button
           onClick={goBackToIssueList}
-          className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center text-sm text-gray-600 hover:text-blue-500 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
-          이슈 목록
+          이슈 목록으로 돌아가기
         </button>
       </div>
       {/* 이슈 번호 */}
