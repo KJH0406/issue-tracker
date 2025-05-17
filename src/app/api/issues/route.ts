@@ -84,7 +84,11 @@ export async function POST(req: NextRequest) {
         projectId: project.id,
       },
       include: {
-        author: true,
+        author: {
+          select: {
+            username: true,
+          },
+        },
       },
     })
 
@@ -169,7 +173,11 @@ export async function GET(req: NextRequest) {
     where: { projectId: project.id },
     orderBy: { createdAt: "desc" },
     include: {
-      author: true,
+      author: {
+        select: {
+          username: true,
+        },
+      },
     },
   })
 

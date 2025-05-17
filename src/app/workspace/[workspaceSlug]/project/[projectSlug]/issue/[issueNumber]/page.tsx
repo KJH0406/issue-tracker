@@ -1,5 +1,5 @@
-// 이슈 상세 페이지
+import { IssueDetail } from "@/components/issue/IssueDetail"
 
 export default function IssueDetailPage() {
-  return <div>IssueDetailPage</div>
+  return <IssueDetail />
 }

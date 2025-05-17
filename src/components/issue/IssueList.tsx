@@ -1,8 +1,8 @@
 "use client"
 
-import { CalendarIcon, Link } from "lucide-react"
 import { Issue } from "@/types/issue"
 import { useRouter } from "next/navigation"
+import { getStatusStyle } from "@/lib/utils"
 
 // 이슈 목록 컴포넌트
 export function IssueList({
@@ -42,59 +42,95 @@ export function IssueList({
 
   return (
     <div className="border rounded-lg overflow-hidden w-full">
-      <div className="bg-gray-100 px-6 py-3 border-b">
-        <div className="grid grid-cols-12 gap-4 font-medium text-sm text-gray-600">
-          <div className="col-span-1">일감 번호</div>
-          <div className="col-span-5">제목</div>
-          <div className="col-span-3">생성일</div>
-          <div className="col-span-2">생성자</div>
-        </div>
-      </div>
-      <ul className="divide-y">
-        {issues.map((issue) => {
-          const createdDate = new Date(issue.createdAt).toLocaleDateString(
-            "ko-KR",
-            {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }
-          )
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-100">
+            <tr>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-1/12"
+              >
+                일감 번호
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-5/12"
+              >
+                제목
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-2/12"
+              >
+                상태
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-2/12"
+              >
+                생성일
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider w-2/12"
+              >
+                생성자
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {issues.map((issue) => {
+              const createdDate = new Date(issue.createdAt).toLocaleDateString(
+                "ko-KR",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              )
 
-          return (
-            <li
-              key={issue.id}
-              className="hover:bg-gray-50 transition-colors cursor-pointer"
-              onClick={() => {
-                router.push(
-                  `/workspace/${workspaceSlug}/project/${projectSlug}/issue/${issue.number}`
-                )
-              }}
-            >
-              <div className="px-6 py-4 grid grid-cols-12 gap-4 items-center">
-                <div className="col-span-1 text-sm text-gray-500">
-                  #{projectSlug}-{issue.number}
-                </div>
-                <div className="col-span-5">
-                  <h3 className="font-medium text-gray-900">{issue.title}</h3>
-                  {issue.description && (
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-1">
-                      {issue.description}
-                    </p>
-                  )}
-                </div>
-                <div className="col-span-3 text-sm text-gray-500 flex items-center">
-                  <CalendarIcon className="w-4 h-4 mr-1" />
-                  {createdDate}
-                </div>
-                <div className="col-span-2 text-sm text-gray-500">
-                  {issue.author?.username || "사용자"}
-                </div>
-              </div>
-            </li>
-          )
-        })}
-      </ul>
+              return (
+                <tr
+                  key={issue.id}
+                  className="hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => {
+                    router.push(
+                      `/workspace/${workspaceSlug}/project/${projectSlug}/issue/${issue.number}`
+                    )
+                  }}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    #{projectSlug}-{issue.number}
+                  </td>
+                  <td className="px-6 py-4">
+                    <h3 className="font-medium text-gray-900">{issue.title}</h3>
+                    {issue.description && (
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-1">
+                        {issue.description}
+                      </p>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        getStatusStyle(issue.status).color
+                      }`}
+                    >
+                      {getStatusStyle(issue.status).label}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {createdDate}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {issue.author?.username || "사용자"}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

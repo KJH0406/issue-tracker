@@ -73,6 +73,8 @@ model Issue {
   description String?
   createdAt   DateTime @default(now())
 
+  status      IssueStatus @default(TODO)
+
   projectId   String
   project     Project @relation(fields: [projectId], references: [id])
 
@@ -80,4 +82,12 @@ model Issue {
   author      User @relation(fields: [authorId], references: [id])
 
   @@unique([projectId, number]) // 프로젝트 내 이슈 숫자 중복 방지
+}
+
+// 이슈 상태
+enum IssueStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
 }

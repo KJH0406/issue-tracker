@@ -43,6 +43,7 @@ export default function ProjectHomePage() {
 
   // 이슈 생성 후 목록에 직접 추가
   const handleIssueCreated = (newIssue: Issue) => {
+    console.log(newIssue)
     setIssues((prevIssues) => [newIssue, ...prevIssues])
   }
 

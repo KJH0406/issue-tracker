@@ -10,4 +10,5 @@ export type Issue = {
   author: {
     username: string
   }
+  status: string
 }
