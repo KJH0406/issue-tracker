@@ -17,7 +17,7 @@ export async function GET() {
     // 사용자 정보 조회
     const userInfo = await prisma.user.findUnique({
       where: { id: user.userId },
-      select: { username: true, email: true },
+      select: { username: true, email: true, id: true },
     })
 
     if (!userInfo) {
