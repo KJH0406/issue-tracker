@@ -53,17 +53,32 @@ export function Sidebar() {
     setIsProjectCreateModalOpen(false)
   }
 
+  // 공간 홈 경로
+  const workspaceHomeHref = `/workspace/${workspaceSlug}`
+  // 공간 홈 활성화 여부 확인
+  const isWorkspaceHomeActive = pathname === workspaceHomeHref
+
   return (
     <aside className="w-60 h-full border-r bg-gray-50">
-      <div className="px-4 py-5">
+      <div className="px-2 py-5">
         {/* 공간 홈 */}
         <div className="flex items-center justify-between mb-6">
           <Link
-            href={`/workspace/${workspaceSlug}`}
-            className="flex items-center space-x-2 w-full hover:bg-gray-100 transition-colors"
+            href={workspaceHomeHref}
+            className={cn(
+              "flex items-center space-x-2 w-full py-2 px-2 rounded-md text-sm transition-colors",
+              isWorkspaceHomeActive
+                ? "bg-blue-50 text-blue-700 font-medium"
+                : "text-gray-700 hover:bg-gray-100"
+            )}
           >
-            <Home size={16} className="text-gray-600" />
-            <h2 className="font-semibold text-gray-800 text-sm">공간 홈</h2>
+            <Home
+              size={16}
+              className={cn(
+                isWorkspaceHomeActive ? "text-blue-600" : "text-gray-600"
+              )}
+            />
+            <h2 className="font-semibold text-sm">공간 홈</h2>
           </Link>
         </div>
 
@@ -95,7 +110,7 @@ export function Sidebar() {
                       key={project.id}
                       href={href}
                       className={cn(
-                        "flex items-center py-2 rounded-md text-sm transition-colors",
+                        "flex items-center py-2 px-2 rounded-md text-sm transition-colors",
                         isActive
                           ? "bg-blue-50 text-blue-700 font-medium"
                           : "text-gray-700 hover:bg-gray-100"
