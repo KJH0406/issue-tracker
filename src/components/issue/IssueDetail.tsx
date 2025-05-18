@@ -199,7 +199,8 @@ export function IssueDetail() {
   // 댓글 삭제 권한 확인 함수
   const canDeleteComment = (comment: any) => {
     // 작성자이거나 관리자인 경우 삭제 가능
-    return String(comment.authorId) === String(userId)
+
+    return String(comment.authorId) === String(userId) || userRole === "ADMIN"
   }
 
   return (
