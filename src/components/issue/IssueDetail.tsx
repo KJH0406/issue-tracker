@@ -32,6 +32,8 @@ export function IssueDetail() {
 
   // 삭제 모달 상태 추가
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isCommentDeleteModalOpen, setIsCommentDeleteModalOpen] =
+    useState(false)
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -176,18 +178,21 @@ export function IssueDetail() {
       setComments(data)
     } catch (error: any) {
       toast.error(error.message)
+    } finally {
+      setIsCommentDeleteModalOpen(false)
+      setCommentToDelete(null)
     }
   }
 
   // 댓글 삭제 모달 열기 함수
   const openDeleteModal = (commentId: string) => {
     setCommentToDelete(commentId)
-    setIsDeleteModalOpen(true)
+    setIsCommentDeleteModalOpen(true)
   }
 
   // 댓글 삭제 모달 닫기 함수
   const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false)
+    setIsCommentDeleteModalOpen(false)
     setCommentToDelete(null)
   }
 
@@ -360,13 +365,22 @@ export function IssueDetail() {
         </div>
       </div>
 
-      {/* DeleteConfirmModal 컴포넌트 사용 */}
+      {/* DeleteConfirmModal 컴포넌트 사용 - 이슈 삭제용 */}
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteIssue}
         title="이슈 삭제"
-        description={`이슈 "${issue?.title}"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
+        description={`"${issue?.title}" 이슈를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
+      />
+
+      {/* 댓글 삭제용 모달 추가 */}
+      <DeleteConfirmModal
+        isOpen={isCommentDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDeleteComment}
+        title="댓글 삭제"
+        description="이 댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
       />
     </div>
   )
