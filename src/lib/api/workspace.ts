@@ -36,3 +36,40 @@ export async function getUserWorkspaceRole(workspaceSlug: string) {
   if (!res.ok) throw new Error(json.message || "역할 정보 불러오기 실패")
   return json.role
 }
+
+// 워크스페이스 멤버 목록 조회 API
+export async function fetchWorkspaceMembers(workspaceSlug: string) {
+  const res = await fetch(`/api/workspaces/${workspaceSlug}/members`)
+  if (!res.ok) throw new Error("워크스페이스 멤버 목록 불러오기 실패")
+  return res.json()
+}
+
+// 워크스페이스 멤버 역할 변경 API
+export async function updateMemberRole(
+  workspaceSlug: string,
+  userId: string,
+  role: string
+) {
+  const res = await fetch(
+    `/api/workspaces/${workspaceSlug}/members/${userId}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role }),
+    }
+  )
+  if (!res.ok) throw new Error("역할 변경 실패")
+  return res.json()
+}
+
+// 워크스페이스 멤버 제거 API
+export async function removeMember(workspaceSlug: string, userId: string) {
+  const res = await fetch(
+    `/api/workspaces/${workspaceSlug}/members/${userId}`,
+    {
+      method: "DELETE",
+    }
+  )
+  if (!res.ok) throw new Error("멤버 제거 실패")
+  return res.json()
+}
