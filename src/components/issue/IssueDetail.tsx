@@ -3,14 +3,15 @@
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { getStatusStyle } from "@/lib/utils"
-import { getIssue, updateIssueStatus } from "@/lib/api/issue"
+import { getIssue, updateIssueStatus, deleteIssue } from "@/lib/api/issue"
 import { IssueStatus } from "@prisma/client"
-import { ArrowLeft, Badge } from "lucide-react"
+import { ArrowLeft, Badge, Trash2Icon } from "lucide-react"
 import { toast } from "react-hot-toast"
 import { deleteComment, getComments } from "@/lib/api/comment"
 import { createComment } from "@/lib/api/comment"
 import { getUserWorkspaceRole } from "@/lib/api/workspace"
 import { DeleteConfirmModal } from "@/components/common/DeleteConfirmModal"
+import { Button } from "@/components/ui/button"
 
 // 이슈 상세 페이지
 export function IssueDetail() {
@@ -32,6 +33,7 @@ export function IssueDetail() {
   // 삭제 모달 상태 추가
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     const fetchIssue = async () => {
@@ -115,6 +117,22 @@ export function IssueDetail() {
     }
   }
 
+  // 삭제 처리 함수 추가
+  const handleDeleteIssue = async () => {
+    if (!issue) return
+
+    setIsDeleting(true)
+    try {
+      await deleteIssue(issue.id)
+      toast.success("이슈가 삭제되었습니다.")
+      router.push(`/workspace/${workspaceSlug}/project/${projectSlug}`)
+    } catch (error: any) {
+      toast.error(error.message || "이슈 삭제에 실패했습니다.")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   if (loading) return <p>이슈 불러오는 중...</p>
   if (error) return <p className="text-red-500">오류: {error}</p>
   if (!issue) return <p>이슈 없음</p>
@@ -195,9 +213,23 @@ export function IssueDetail() {
       <span className="text-gray-500 text-sm">
         #{projectSlug}-{issue.number}
       </span>
-      {/* 이슈 제목 */}
-      <div className="flex items-center space-x-2">
+      {/* 이슈 제목 및 상태 표시 부분 */}
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{issue.title}</h1>
+        <div className="flex gap-2">
+          {/* 기존 상태 변경 버튼 등 */}
+
+          {/* 삭제 버튼 추가 */}
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setIsDeleteModalOpen(true)}
+            disabled={updating || isDeleting}
+          >
+            <Trash2Icon className="w-4 h-4 mr-1" />
+            삭제
+          </Button>
+        </div>
       </div>
 
       {/* 메타데이터 그리드 */}
@@ -332,10 +364,9 @@ export function IssueDetail() {
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
-        onConfirm={handleDeleteComment}
-        title="댓글 삭제"
-        description="댓글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
-        resourceType="댓글"
+        onConfirm={handleDeleteIssue}
+        title="이슈 삭제"
+        description={`이슈 "${issue?.title}"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
       />
     </div>
   )

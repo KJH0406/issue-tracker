@@ -91,3 +91,18 @@ export async function updateIssueStatus(issueId: string, status: IssueStatus) {
 
   return json.issue
 }
+
+// 이슈 삭제
+export async function deleteIssue(issueId: string): Promise<void> {
+  const res = await fetch(`/api/issues/${issueId}`, {
+    method: "DELETE",
+  })
+
+  const json = await res.json()
+
+  if (!res.ok) {
+    throw new Error(json.message || "이슈 삭제 실패")
+  }
+
+  return
+}
