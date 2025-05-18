@@ -2,7 +2,6 @@ import { ReactNode } from "react"
 import { redirect } from "next/navigation"
 
 import { getAuthUser } from "@/lib/auth"
-
 import { Header } from "@/components/layout/Header"
 
 // 공간 루트 레이아웃
@@ -19,7 +18,7 @@ export default async function WorkspaceRootLayout({
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      {children}
+      <div className="flex-1 overflow-hidden">{children}</div>
     </div>
   )
 }
