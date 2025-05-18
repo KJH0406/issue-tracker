@@ -269,9 +269,9 @@ export function IssueDetail() {
           </div>
         </div>
 
-        {/* 담당자 */}
+        {/* 생성자 */}
         <div className="flex items-center">
-          <div className="w-32 text-sm text-gray-500">담당자</div>
+          <div className="w-32 text-sm text-gray-500">생성자</div>
           <div className="flex items-center">
             <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-sm font-medium text-purple-600">
               {issue.author?.username?.charAt(0) || "?"}
