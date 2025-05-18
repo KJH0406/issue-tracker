@@ -17,6 +17,7 @@ model User {
   createdAt DateTime         @default(now())
 
   workspaces WorkspaceUser[] // 사용자 → 공간 연결 (다대다 관계)
+  projectUsers ProjectUser[] // 사용자 → 프로젝트 연결 (일대다 관계)
   issues     Issue[] // 사용자 → 이슈 연결 (일대다 관계)
   comments   Comment[] // 사용자 → 댓글 연결 (일대다 관계)
 }
@@ -63,7 +64,30 @@ model Project {
   createdAt    DateTime   @default(now())
 
   workspace    Workspace  @relation(fields: [workspaceId], references: [id])
+  projectUsers ProjectUser[] // 프로젝트 → 사용자 연결 (일대다 관계)
   issues       Issue[] // 프로젝트 → 이슈 연결 (일대다 관계)
+}
+
+
+// 프로젝트 사용자 중개 모델
+model ProjectUser {
+  id        String       @id @default(cuid())
+  projectId String
+  userId    String
+  role      ProjectRole
+  createdAt DateTime     @default(now())
+
+  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+
+enum ProjectRole {
+  ADMIN
+  MEMBER
+  VIEWER
 }
 
 // 이슈 모델

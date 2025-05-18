@@ -5,3 +5,10 @@ export type Project = {
   slug: string
   description: string | null
 }
+
+// 프로젝트 역할
+export enum ProjectRole {
+  ADMIN = "ADMIN",
+  MEMBER = "MEMBER",
+  VIEWER = "VIEWER",
+}
